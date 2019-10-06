@@ -3,6 +3,7 @@ import { StyleSheet, Text, TextInput, View } from 'react-native';
 import { StatusBar, TouchableOpacity, TouchableHighlight, Image, ScrollView, FlatList, Modal } from 'react-native';
 import openSocket from 'socket.io-client';
 import FbGrid from "react-native-fb-image-grid";
+import Video from 'react-native-video';
 
 // export default function App() {
 //   return (
@@ -11,7 +12,7 @@ import FbGrid from "react-native-fb-image-grid";
 //     </View>
 //   );
 // }
-const serverURL = 'http://192.168.1.4:3000'
+const serverURL = 'http://10.64.7.61:3000'
 const socket = openSocket(serverURL);
 const DEVICE_TYPE_CONTROL = 'control'
 const DEVICE_TYPE_DISPLAY = 'display'
@@ -26,43 +27,11 @@ class App extends Component {
       socketId: '',
       joined: false,
       showModal: false,
-      availableDevices:[
-        'test',
-        'best',
-      ],
+      availableDevices:[],
       selectedDevices:[],
       showImage:`${serverURL}/images/img2.jpeg`,
       selectedImage:'',
-      availableImages:  [
-      "http://localhost:3000/images/img2.jpeg",
-      "http://localhost:3000/images/img1.jpeg",
-      "http://localhost:3000/images/sc.jpeg",
-      "http://localhost:3000/images/img1.jpeg",
-      "http://localhost:3000/images/img2.jpeg",
-      "http://localhost:3000/images/img1.jpeg",
-      "http://localhost:3000/images/sc.jpeg",
-      "http://localhost:3000/images/img2.jpeg",
-      "http://localhost:3000/images/img1.jpeg",
-      "http://localhost:3000/images/sc.jpeg",
-      "http://localhost:3000/images/img1.jpeg",
-      "http://localhost:3000/images/img2.jpeg",
-      "http://localhost:3000/images/img1.jpeg",
-      "http://localhost:3000/images/sc.jpeg",
-      "http://localhost:3000/images/img2.jpeg",
-      "http://localhost:3000/images/img1.jpeg",
-      "http://localhost:3000/images/sc.jpeg",
-      "http://localhost:3000/images/img1.jpeg",
-      "http://localhost:3000/images/img2.jpeg",
-      "http://localhost:3000/images/img1.jpeg",
-      "http://localhost:3000/images/sc.jpeg",
-      "http://localhost:3000/images/img2.jpeg",
-      "http://localhost:3000/images/img1.jpeg",
-      "http://localhost:3000/images/sc.jpeg",
-      "http://localhost:3000/images/img1.jpeg",
-      "http://localhost:3000/images/img2.jpeg",
-      "http://localhost:3000/images/img1.jpeg",
-      "http://localhost:3000/images/sc.jpeg",
-     ,]
+      availableImages:  []
     }
     this.onPressConfirm = this.onPressConfirm.bind(this)
     
@@ -160,8 +129,17 @@ class App extends Component {
     return (
       <View style={styles.container}>
         { this.state.joined && this.state.deviceType === DEVICE_TYPE_DISPLAY ? <View style={styles.containerDisplay}> 
-          <Text>disply time</Text>
+          
           <Image source={{uri: this.state.showImage}} style={styles.image} />
+        
+          {/* <Video 
+          source={{uri: "http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4"}}   // Can be a URL or a local file.
+            ref={(ref) => {
+              this.player = ref
+            }}                                      // Store reference
+            onBuffer={this.onBuffer}                // Callback when remote video is buffering
+            onError={this.videoError}               // Callback when video cannot be loaded
+            style={{ width: 300, height: 300 }} /> */}
         </View> : <View/>
         }
 
@@ -196,35 +174,36 @@ class App extends Component {
         </View> : <View/>
         }
         { !this.state.joined && 
-          <View >
-            <Text>Enter Device name</Text>
+          <View style={styles.containerNormal}>
+            <Text style={{fontSize:44, color:'#4b676c'}}>Future Verse</Text>
             <TextInput
-              style={{height: 40}}
-              placeholder="Device Name"
+              style={{ fontSize: 18, height: 100, width:250, justifyContent:'center', alignItems:'center'}}
+              placeholder="Enter your device name here.."
               onChangeText={(deviceName) => this.setState({deviceName})}
               value={this.state.deviceName}
             />
-          <TouchableOpacity 
-            style={ this.state.deviceType === DEVICE_TYPE_DISPLAY? 
-              styles.selectedButton: styles.button}
-            onPress={()=>{this.setState({deviceType:DEVICE_TYPE_DISPLAY})}}
-          >
-            <Text>Display</Text>
-          </TouchableOpacity>
+          <View style={{flexDirection:'row', height:80, backgroundColor:'white'}}>
+            <TouchableOpacity 
+              style={ this.state.deviceType === DEVICE_TYPE_DISPLAY? 
+                styles.selectedButton: styles.button}
+              onPress={()=>{this.setState({deviceType:DEVICE_TYPE_DISPLAY})}}
+            >
+              <Text>Display</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={ this.state.deviceType === DEVICE_TYPE_CONTROL? 
-              styles.selectedButton: styles.button}
-            onPress={()=>{this.setState({deviceType:DEVICE_TYPE_CONTROL})}}
-          >
-            <Text>Control</Text>
-          </TouchableOpacity>
-
+            <TouchableOpacity 
+              style={ this.state.deviceType === DEVICE_TYPE_CONTROL? 
+                styles.selectedButton: styles.button}
+              onPress={()=>{this.setState({deviceType:DEVICE_TYPE_CONTROL})}}
+            >
+              <Text>Control</Text>
+            </TouchableOpacity>
+          </View>
           <TouchableOpacity 
             style={styles.buttonConfirm}
             onPress={this.onPressConfirm}
           >
-            <Text>Confirm</Text>
+            <Text style={{color:'white', fontSize:20}}>Confirm</Text>
           </TouchableOpacity>
         </View>
         }
@@ -244,15 +223,15 @@ class App extends Component {
               extraData={this.state}
               renderItem={({ item }) => (
                 <TouchableOpacity onPress={()=>this.onPressDeviceName(item)} style={this.state.selectedDevices.indexOf(item) > -1?styles.listItemSelected:styles.listItem} >
-                 <Text style={{fontSize:50, padding:20,  }}>{item}</Text>
+                 <Text style={{fontSize:24, padding:10,  }}>{item}</Text>
                 {console.log('from list', this.state.selectedDevices)}
                 </TouchableOpacity>
               
               )}
               keyExtractor={(item, index) => index.toString()}
           />
-               <TouchableOpacity style={styles.button} onPress={()=>{this.broadcastContent()}}>
-                 <Text>show</Text>
+               <TouchableOpacity style={styles.buttonConfirm} onPress={()=>{this.broadcastContent()}}>
+                 <Text style={{color:'white', fontSize:'24'}}>Start Showing</Text>
               </TouchableOpacity>
              </View>
            </Modal>
@@ -271,10 +250,9 @@ export default App;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: 'white',
     alignItems: 'center',
     // justifyContent: 'center',
-    //marginTop:50,
     flexDirection: 'column'
   },
   containerDisplay: {
@@ -284,36 +262,58 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '100%'
   },
+  containerNormal: {
+    flex: 1,
+    backgroundColor: 'white',
+    alignItems: 'center',
+    marginTop: 60,
+    width: '100%'
+  },
   containerControl: {
     // flex: 1,
     // backgroundColor: 'black',
     // alignItems: 'center',
     // justifyContent: 'center',
+    backgroundColor:'white',
+    marginTop: 60,
     width: 400,
     height: 900
   },
   button: {
     alignItems: 'center',
-    backgroundColor: '#DDD',
-    fontSize: 18,
-    padding: 10,
+    backgroundColor: 'lightgrey',
+    borderColor: 'darkgrey',
+    fontSize: 20,
+    justifyContent: 'center',
     borderWidth: 1,
+    borderRadius: 10,
+    height:50,
+    width:130,
+    margin:10
   },
   selectedButton: {
     alignItems: 'center',
-    backgroundColor: 'lightblue',
-    fontSize: 18,
-    padding: 10,
+    backgroundColor: '#3d9aaa85',
+    borderColor: 'darkgrey',
+    fontSize: 20,
+    justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'blue'
+    borderRadius: 10,
+    height:50,
+    width:130,
+    margin:10
   },
   buttonConfirm: {
-    marginTop: 20,
     alignItems: 'center',
-    backgroundColor: '#DDD',
-    fontSize: 18,
-    padding: 10,
+    justifyContent: 'center',
+    backgroundColor: '#3d9aaa',
+    fontSize: 20,
+    color:'white',
     borderWidth: 1,
+    borderRadius: 15,
+    height:50,
+    width:230,
+    margin:10
   },
   image: {
     
@@ -343,27 +343,32 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 50, 
-    backgroundColor:'red'
+    backgroundColor:'#dbe8ecf5'
     
   },
   listItem: { 
-    fontSize:20, 
-    flex: 1, 
-    width:350,
-    backgroundColor:'yellow', 
-    margin:10, 
-    flexDirection: 'row', 
-    borderColor:"green", 
-    borderWidth:1 
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'lightgrey',
+    borderColor: 'darkgrey',
+    fontSize: 20,
+    borderWidth: 1,
+    borderRadius: 10,
+    height:50,
+    width:300,
+    margin:10
+
   },
   listItemSelected: { 
-    fontSize:20, 
-    flex: 1, 
-    width:350,
-    backgroundColor:'blue', 
-    margin:10, 
-    flexDirection: 'row', 
-    borderColor:"green", 
-    borderWidth:1 
+    alignItems: 'center',
+    backgroundColor: '#3d9aaa85',
+    borderColor: 'darkgrey',
+    fontSize: 20,
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderRadius: 10,
+    height:50,
+    width:300,
+    margin:10
   },
 });
